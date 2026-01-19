@@ -43,12 +43,12 @@
 - (verify?)<mark style="background: #BBFABBA6;"> A is a **metalanguage** for B</mark>: language B is implemented in another language A
 - (verify?) language B is implemented in another another language A: there exists an interpreter written in language A for the language B
 
-![[3. Resources/MOCs/CPL/CPL-Summary/CPL Summary/image.png|641x260]]
+![[image.png|641x260]]
 
 ## Modern programming languages core features
 
 - **Lexical scoping**: search for a variable binding in the current scope first, if it is not present, search for the binding in the outer scopes recursively
-![[3. Resources/MOCs/CPL/CPL-Summary/CPL Summary/image-1.png|search for binding y of y in inner scope first, then outers scope]]
+![[image-1.png|search for binding y of y in inner scope first, then outers scope]]
 
 - Eager evaluation of expressions: compute results before you need them
 - Updatable variables (= mutations/assignments)
@@ -62,9 +62,9 @@
 
 ## Function definitions vs Function calls
 
-![[3. Resources/MOCs/CPL/CPL-Summary/CPL Summary/image-2.png|Function definition|424x91]]
+![[image-2.png|Function definition|424x91]]
 
-![[3. Resources/MOCs/CPL/CPL-Summary/CPL Summary/image-3.png|Function application|186x128]]
+![[image-3.png|Function application|186x128]]
 
 - Argument to
 	- Function definition: **formal parameter**
@@ -74,7 +74,7 @@
 
 - Able to express: expressions or pure data
 
-![[3. Resources/MOCs/CPL/CPL-Summary/CPL Summary/image-4.png|atom = pure data]]
+![[image-4.png|atom = pure data]]
 
 ## Stacker: key concepts
 
@@ -88,7 +88,7 @@
 
 ## SMoL syntax
 
-![[3. Resources/MOCs/CPL/CPL-Summary/CPL Summary/image-5.png]]
+![[image-5.png]]
 
 
 # Chapter 3
@@ -115,7 +115,7 @@ There is no such thing as an interpreted language or compiled language → a lan
 ## BNF format
 
 - Initial language
-![[3. Resources/MOCs/CPL/CPL-Summary/CPL Summary/image-6.png|355x164]]
+![[image-6.png|355x164]]
 
 
 - 3 things to support conditionals: 
@@ -125,22 +125,22 @@ There is no such thing as an interpreted language or compiled language → a lan
 
 - The branches of a conditional statement must have the same type in statically typed languages
 
-![[3. Resources/MOCs/CPL/CPL-Summary/CPL Summary/image-7.png|new abstract syntax representation]]
+![[image-7.png|new abstract syntax representation]]
 
 - We need to distinguish between type-constructors that produce **abstract syntax** and type-constructors that produce **values**
-![[3. Resources/MOCs/CPL/CPL-Summary/CPL Summary/image-8.png|150x101]]
+![[image-8.png|150x101]]
 
 (?) If you don’t have variables and functions → you don’t have a program
 
 **Binding**: assign a value to variable
 **Local**: limited to some region of the program, not outside of it
 
-![[3. Resources/MOCs/CPL/CPL-Summary/CPL Summary/image-9.png|510x160]]
+![[image-9.png|510x160]]
 
-![[3. Resources/MOCs/CPL/CPL-Summary/CPL Summary/image-10.png|356x78|<var> to use a bound variable]]
+![[image-10.png|356x78|<var> to use a bound variable]]
 
 
-![[3. Resources/MOCs/CPL/CPL-Summary/CPL Summary/image-11.png|210x171]]
+![[image-11.png|210x171]]
 
 ### Functions in the language
 
@@ -161,18 +161,18 @@ Argument evaluation order:
 - 2) get the values corresponding to the arguments
 - 3) bind the values to the variables → get a new environment
 - 4) use the new environment to evaluate the body
-![[3. Resources/MOCs/CPL/CPL-Summary/CPL Summary/image-12.png|451x134]]
+![[image-12.png|451x134]]
 
 **Eager evaluation**: evaluate argument expression before passing them as arguments to the function
 **Lazy evaluation**: defer evaluation of argument expressions when referenced in the body of the function
 
-![[3. Resources/MOCs/CPL/CPL-Summary/CPL Summary/image-13.png|Maxwell’s equations of software]]
+![[image-13.png|Maxwell’s equations of software]]
 **Static scoping**: binding of a variable is determined by the variable’s position in the program, not the program’s execution
 **Dynamic scoping**: binding of a variable is determined by its most recently executed binding
 - binding != value of a variable. Value can change for the same binding.
 
 - Dynamic scoping: evaluation result of `coin-flip` cannot be determined before execution → cannot determine binding of x before execution!
-![[3. Resources/MOCs/CPL/CPL-Summary/CPL Summary/image-14.png|dynamic scoping problem illustration]]
+![[image-14.png|dynamic scoping problem illustration]]
 
 - A person that reads programs can’t be sure about the binding structure of our programs
 
@@ -199,13 +199,13 @@ Argument evaluation order:
 
 We define objects as syntactic sugar
 
-![[3. Resources/MOCs/CPL/CPL-Summary/CPL Summary/image-17.png|class pattern (without extras)|391x93]]
+![[image-17.png|class pattern (without extras)|391x93]]
 
-![[3. Resources/MOCs/CPL/CPL-Summary/CPL Summary/image-18.png|class pattern (with private state)|472x114]]
+![[image-18.png|class pattern (with private state)|472x114]]
 
-![[3. Resources/MOCs/CPL/CPL-Summary/CPL Summary/image-15.png|class pattern (with private state and static members)|605x175]]
+![[image-15.png|class pattern (with private state and static members)|605x175]]
 
-![[3. Resources/MOCs/CPL/CPL-Summary/CPL Summary/image-16.png|class pattern (private, static and self-reference)|572x204]]
+![[image-16.png|class pattern (private, static and self-reference)|572x204]]
 
 ## Important concepts
 
@@ -228,7 +228,7 @@ Two interesting questions about classes/objects:
 - Is the **member being accessed** statically fixed or can it be computed dynamically?
 	- (the member name you use)
 
-![[3. Resources/MOCs/CPL/CPL-Summary/CPL Summary/image-19.png|747x175]]
+![[image-19.png|747x175]]
 [[Member name design space examples]]
 
 ## Inheritance
@@ -243,9 +243,9 @@ Two interesting questions about classes/objects:
 
 ---
 
-![[3. Resources/MOCs/CPL/CPL-Summary/CPL Summary/image-20.png|creates a new parent instance for every msg lookup in parent|266x200]]
+![[image-20.png|creates a new parent instance for every msg lookup in parent|266x200]]
 
-![[3. Resources/MOCs/CPL/CPL-Summary/CPL Summary/image-21.png|creates only one instance of the parent|275x221]]
+![[image-21.png|creates only one instance of the parent|275x221]]
 
 
 
