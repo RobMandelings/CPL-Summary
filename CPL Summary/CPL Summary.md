@@ -349,7 +349,10 @@ CPS transformation is hard to understand due to inversion of control
 	- **Node.js**: web and network application server
 		- **No execution in a sandbox**
 
-Scripts has access to DOM and Local storage (left). Modules have access to network IO and file IO.
+- JavaScript code is **embedded in a host environment**:
+	- If embedded **within browser host**: access to DOM and Local storage
+	- If embedded **within server host**: access to network and file IO
+
 ![[image-27.png|535x249]]
 
 Three most important values in JS programs:
@@ -359,6 +362,7 @@ Three most important values in JS programs:
 		- Can lookup properties based on **computed key**
 		- Can turn all properties of an object into an array and iterate over them
 	- **Property**: key-value pair
+		- Property values can be functions
 	- **Object literal:** expressions that evaluate to a fresh object
 		- Can be nested
 - **Arrays**: sequences of values (similar to Python or Java lists)
@@ -367,4 +371,76 @@ Three most important values in JS programs:
 		- Out of range → return `undefined`
 	- You can dynamically grow/shrink to add/remove elements
 	- Arrays are objects with many utility functions (`forEach`, `map`, …)
-- **Functions**
+- **Functions**: functions are values
+	- Functions are **First-class** values → like arrays and objects
+		- **First-class**: it can do everything a normal value can (just to emphasize)
+	- Must use explicit `return` or else returns `undefined`
+	- **Higher-order** functions: can take other functions as input or return other functions as output
+	- Functions may use variables from their lexically enclosing scope (= closures)
+	- **Arrow functions**: notational shorthand
+		- Always anonymous
+		- Function body: expression
+			- Without `{ }`: no `return` statement required
+			- If enclosed with `{ }`: statement (`return` statement required if you want to require something)
+		- **Method**: a function-valued property of an object that can be called with `object.method(arg)`
+		- Functions **can be used as class constructors**: returns new object on each function call
+
+
+![[CPL Summary 2026-01-20 21.13.25.excalidraw|example JS code]]
+
+## Class syntax
+Class syntax = syntactic sugar: still a function at runtime
+- use the `new` keyword if you want to create an object from the class
+
+![[CPL Summary 2026-01-20 21.17.10.excalidraw|comparison class syntax vs plain function syntax]]
+
+Javascript uses **prototypal inheritance**
+
+Javascript is dynamically typed:
+- **Dynamically typed:** values have a runtime type, but variables or object properties do not have a static type
+**TypeScript**: dialect of JS that allows for (optional) static type annotations
+- TypeScript supports **Type Inference**: we can deduce the type of a variable based on how it’s used in the program
+
+> “JavaScript is a List in C’s clothing”. Why?
+
+![[image-29.png|JS code execution on browser + idea of event loop|510x192]]
+
+![[image-28.png|JS code execution for nodejs|243x191]]
+
+**Event loop**: invisible infinite loop that calls JS code
+- Executed by a **single thread** of control
+- Events are processed **one at a time**
+- When an event occurs: it gets enqueued in **event queue**
+- If there are are no events to process: event loop is **idle**
+- UI rendering is performed by the same event loop while no events are being processed
+- ***NEVER* block the event loop!**
+To respond to an event: register an **event handler**
+**Callback:** function that acts as the event handler
+
+## Callback functions
+
+All code in `<script></script>` elements share the **same** event loop
+A node.js process provides a single event loop for its code
+
+Events in javascript make use of inversion of control
+
+> Inversion of control: “Don’t call us, we’ll call you”
+
+![[image-30.png|example in JS where the continuation (event handler) is called after input (event) is obtained (occurs)]]
+
+## IO in event loops
+**XMLHTTPRequest**: a legacy browser API that allows HTTP requests to be made within JS code
+- More modern alternatives exist now
+- **XHR**: the HTTP requests made by JS Scripts in browser to a server
+	- (?) Refers to the actual requests, not the API?
+	- Asynchronous: allows for processing other events while the request is pending
+		- If XHR was synchronous then the entire event loop would be **blocked** and the web page would be **unresponsive**
+
+![[CPL Summary 2026-01-20 21.58.15.excalidraw|callback hell]]
+**Callback hell**: async IO leads to inversion of control
+
+Exceptions don’t work for asynchronous operations
+- Caller has already returned when the operation is executed
+- Common pattern: pass error object as argument to callback function
+	- If success: error is `undefined`
+	- If failed: error contains `Error` object with details
