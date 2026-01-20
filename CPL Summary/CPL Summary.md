@@ -43,7 +43,7 @@
 - (verify?)<mark style="background: #BBFABBA6;"> A is a **metalanguage** for B</mark>: language B is implemented in another language A
 - (verify?) language B is implemented in another another language A: there exists an interpreter written in language A for the language B
 
-![[image.png|641x260]]
+![[image.png|223x105]]
 
 ## Modern programming languages core features
 
@@ -91,11 +91,11 @@
 ![[image-5.png]]
 
 
-# Chapter 3
+# Chapter 3: Evaluation
 
 Two types of **evaluators**:
-- Interpreters: easier to write, debug and update (in case we need extra features in the language)
-- Compilers: aim to generate efficient code in a target language
+- **Interpreters**: easier to write, debug and update (in case we need extra features in the language)
+- **Compilers**: aim to generate efficient code in a target language
 
 **Meta-programs**: programs that operate on other programs
 
@@ -134,11 +134,14 @@ There is no such thing as an interpreted language or compiled language → a lan
 
 **Binding**: assign a value to variable
 **Local**: limited to some region of the program, not outside of it
+- `(let (x 1))`: creates a new environment that **extends** the current environment. Binds `x` to `1` in this **new** environment
+- `(set! x 1)` → **updates** the binding in the **current** environment
 
 ![[image-9.png|510x160]]
 
 ![[image-10.png|356x78|<var> to use a bound variable]]
 
+**Shadowing**: a binding in the child environment overrides a binding in the parent environment 
 
 ![[image-11.png|210x171]]
 
@@ -176,7 +179,9 @@ Argument evaluation order:
 
 - A person that reads programs can’t be sure about the binding structure of our programs
 
-**Closure**: function value that contains environment the function was defined in
+**Closure**: function value that contains environment the 
+function was defined in
+- From function expression to closure: `[(e-lam param body) (v-fun param body env)]`
 **Closed expression**: expression with no unbound variables. 
 	- `(+ x 1)` where x is not bound → unclosed expression
 
@@ -247,8 +252,119 @@ Two interesting questions about classes/objects:
 
 ![[image-21.png|creates only one instance of the parent|275x221]]
 
-
-
 ## Open recursion
 
 **Open recursion**: parent object allows the child object to modify the behaviour of existing methods by overriding members on self.
+## Other forms of inheritance
+
+**Class-based inheritance**: each child has its own personal copy of the parent object
+- Specify in advance which class you are going to extend
+- In object pattern: implemented via ‘chaining’ message lookups
+**Prototypal inheritance**: When two or more child objects inherit from a **common parent object**
+- Changes in common parent object are visible in all child objects
+- prototype-based inheritance
+**Mixin-based inheritance (= mixins)**: classes that can be mixed into any class hierarchy as needed
+- **Mixin**: class that can be mixed into any class hierachy as needed
+- Mixin’s superclass becomes a **parameter** of the mixin → mixin can be viewed as function parameterised with parent class
+- Enables modular class extensions
+**Multiple inheritance**: a class can inherit multiple classes
+- Benefits: flexibility in modelling complex hierarchies without code duplication
+- Drawbacks: problems arise when the superclasses define members with the same name → which one to choose?
+
+![[image-22.png|Mixin’s can be applied as needed. Flyable is not implemented in advance.]]
+
+# Lecture 7: Continuations
+
+**Control operation**: operation that causes an operation to proceed because it controls the program counter of the machine.
+- **Function call**: 
+- **Exception handling:** 
+
+**Local control operation**:
+**Non-local control operation**:
+
+**Local I/O**: performed by tradition programs (e.g. command-line program)
+**Remote I/O**: performed by web-based programs
+
+**Evaluation context**: function calls stored on the stack
+- exists **implicitly** on the stack
+- We need to make this evaluation context **explicit**
+
+![[image-23.png|evaluation context (left) stored in a lambda function to make it explicit]]
+
+When a program needs external input → control is passed to the OS.
+
+Making transfer of control explicit:
+- 1) Explicitly suspend the program at each point in execution where it performs I/O
+- 2) Enable the OS to resume the program with external input from the point at which the program was suspended
+	- OS has control: so OS should take action to resume program
+
+![[image-24.png|get-number/k takes a closure representing the rest of the computation (evaluation context)]]
+
+
+**Continuations**: closures that represent the rest of the computation (= closures that represent evaluation context)
+- denoted with the letter **k**
+- **Continuation-passing-style (CPS)**: style where programs use continuations
+
+## Inversion of control
+
+**Inversion of control**: instead of the innermost operation being done first and the outermost being done last, the innermost operation is done last and the outermost operation is done first.
+
+![[image-25.png|]]
+
+Non-CPS: `print (+ (get-number) (get-number))`
+
+In **both** cases: `get-number` needs to be called first. In CPS style, `get-number/k` gets the number, and then calls the continuation (evaluation context). This is implicit in non-CPS style.
+
+## Call/CC and Let/CC
+- `(let/cc k body ...) = (call/cc (lambda (k) body ...)` 
+	- Merely syntactic sugar → `let/cc` is used in the summary
+
+- `let/cc` allows you to customise what the continuation is after evaluation of the body → the evaluation context of the body is forgotten!
+	- If `k` is called in the body → result of `let/cc k body` is result of `k`
+	- If `k` is not called in the body → result of `let/cc k body` is result of `body`
+	- Unlike with a function call → calling a continuation **never returns**: the evaluation context in which continuation is called is discarded!
+
+![[CPL Summary 2026-01-20 16.51.26.excalidraw|example of how early return is implemented using continuations]]
+
+## Advanced control flow
+
+**Cooperative multi-threading**: each thread must explicitly give up ‘control’ to the thread scheduler to resume another thread
+**Pre-emptive multi-threading**: any thread can yield implicitly after executing a certain period of time or # of instructions
+
+---
+
+CPS transformation is a **global transformation**: all functions require an extra parameter.
+CPS transformation is hard to understand due to inversion of control
+
+# Chapter 8: javascript
+
+- **Javascript on the web**: scripts embedded in web pages, executed on the client
+	- **Mobile code**: code is executed remotely (at the client side) 
+
+![[image-26.png]]
+
+- Javascript on the server: node.js
+	- Renders support for **asynchronous I/O** on files and sockets
+	- **Asynchronous I/O**: IO operations are non-blocking
+	- **Node.js**: web and network application server
+		- **No execution in a sandbox**
+
+Scripts has access to DOM and Local storage (left). Modules have access to network IO and file IO.
+![[image-27.png|535x249]]
+
+Three most important values in JS programs:
+- **Object**: mapping from a key to a value
+	- Dynamic collection of properties
+		- Can add/remove properties **at runtime**
+		- Can lookup properties based on **computed key**
+		- Can turn all properties of an object into an array and iterate over them
+	- **Property**: key-value pair
+	- **Object literal:** expressions that evaluate to a fresh object
+		- Can be nested
+- **Arrays**: sequences of values (similar to Python or Java lists)
+	- `length` property: a **computed property**: returns current number of elements
+	- Can access elements from index 0 to index `length - 1`
+		- Out of range → return `undefined`
+	- You can dynamically grow/shrink to add/remove elements
+	- Arrays are objects with many utility functions (`forEach`, `map`, …)
+- **Functions**
