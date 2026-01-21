@@ -180,6 +180,7 @@ Argument evaluation order:
 - A person that reads programs can’t be sure about the binding structure of our programs
 
 **Closure**: function value that contains environment the 
+- *Running* a closure is valid terminology (like *running a function*)
 function was defined in
 - From function expression to closure: `[(e-lam param body) (v-fun param body env)]`
 **Closed expression**: expression with no unbound variables. 
@@ -303,20 +304,55 @@ $\Gamma(x)$: type that is bound to $x$ in environment $\Gamma$
 $\Gamma$: Type environment. Binds variables to types (e.g. $\Gamma(x) = Num$)
 
 A type system is **sound** $\Leftrightarrow$ if $e:t$, and if $e \rightarrow v$ then $v:t$
-- Whatever type the type-checker predicts the program to have, is exactly the type of the value that the program computes
 - Even if the type-checker is sound: there may exist expressions for which the type-checker predicts a type $e:t$ but will never reduce to a value of that type because the program never terminates.
 
-Similarities and differences between interpretation and type-checking:
+![[image-39.png|191x80]]
+
+### Similarities and difference interpretation and type-checking
 - Similarities:
 	- Both use **environments**
 	- They are **both evaluators**: turn programs into answers
-		- Difference: 
-			- type-checkers produce true/false based on whether the types are consistent
-			- interpreters compute the result of evaluating the program
+
+| Property                 | Type checker             | Interpreter                  |
+| ------------------------ | ------------------------ | ---------------------------- |
+| Result                   | true/false               | computed value               |
+| Input                    | Sees only program text   | Executes actual program data |
+| Environment              | Binds variables to types | Binds variables to *values*  |
+| Termination              | Terminates               | Might not terminate          |
+| Nr of passes in the body | **once**                 | **zero to infinite**         |
 
 Type-safety benefits:
 - **Savings in space** (more compact memory representations of values)
+	- No need to keep **type-tag around**
 - **Savings in time** (prevent run-time type checking)
+	- no need to runtime check for **substitutability** (= whether you can pass it as argument or not)
+
+**Progress**: given a program $p$, if it passes the type checker then
+- or $p$ is a value
+- or $p$ can take a step
+**Preservation**: if $p$ takes a step, then the type of $p$ remains the same
+
+![[image-40.png|398x73]]
+
+Every soundness theorem is a **contract** between the language and the user: The set of published, permitted exceptions or error conditions that *may* still occur
+- E.g. array out of bounds exception is not within this contract
+
+Are languages without static typing doomed?
+- No:
+	- 1) lack of static typ
+	- 2) dynamically typed languages check **at runtime**
+	- 3) statically typed languages also do checks at runtime for statically untractable checks:
+		- dereferencing a pointer
+
+![[image-41.png|292x220]]
+
+**Typed but unsafe**: the type computed by the type-checker is not the same as the type of the value that is computed (**not sound**)
+- E.g. in C++ you can cast `int*` to `char*` and then dereference: `char a = *charPtr`. 
+	- If the value was `1000` then char a wouldn’t make sense.
+
+- Strongly typed and weakly typed languages are poorly defined concepts
+	- Its about the **guarantees of the runtime** (type soundness), not how strong the type checker is.
+	- You can have a type checker that always predicts `Number`, but that doesn’t make any guarantees about the types of the computed values of the program
 
 # Lecture 7: Continuations
 
