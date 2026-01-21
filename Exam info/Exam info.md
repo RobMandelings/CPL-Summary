@@ -18,11 +18,66 @@
 What is the result of evaluating these programs?
 ![[3. Resources/MOCs/CPL/Notes/Exam info/image.png|587x118]]
 
+```plait
+(defvar a 1) 
+(deffun (foo)
+	(lambda (b)
+		(+ a b)))
+(defvar bar (foo))
+(set! a 3)
+(bar 0)
+```
+
+`(deffun (foo) ...)` defines a **function** `foo` that takes no arguments. If you call foo using `(foo)` it creates a new lambda that takes argument `b`.
+
+- `bar` and `foo` are not identical! `bar` takes parameter b while `foo` takes no arguments
+
+---
+
+```plait
+(defvar a (mvec 88))
+(defvar c (mvec a 88 88))
+(set! a (mvec 76))
+```
+
+The vector that a points to is set to a different address, but the address that c points to in the first element remains unchanged. So the result is `@1 88 88` where `@1 = #(88)`.
+
+`mvec a 88 88` $\neq$ `(mvec a) 88 88`! It is simply the keyword to represent vectors.
+
+---
+
+```plait
+(deffun (k b)
+	(lambda (a)
+		(+ a b)))
+(defvar foo (k 3))
+(defvar bar (k 2))
+(foo 3)
+(bar 3)
+```
+
+`(foo 3)`: function call to the lambda with arg `a` in an environment binding `a` to 3 that extends the environment created by `foo`, where `k` is bound to 3. 
+
+This creates the environment necessary to evaluate `(+ a b)`.
+
+---
+
+```plait
+(deffun (inc n)
+	(+ n 1))
+(defvar v (mvec inc inc))
+((vec-ref v 0) 2)
+```
+
+`(deffun (inc n) (+ n 1))` = `(defvar inc (lambda (n) (+ n 1)))`
+
+---
+
 Which of the following edits are not observable compared to the original program?
-![[3. Resources/MOCs/CPL/Notes/Exam info/image-1.png|511x166]]
+![[Exam info 2026-01-21 15.26.18.excalidraw]]
 
 ## SMoL: using Stacker to understand program evaluation
-#CPL/exam-info/tip: ignore address values (still a bit unclear to me). #CPL/unclear : how are address values related in this stacker thing?
+#CPL/exam-info/tip: ignore address values.
 
 - Given a SMoL program
 	- Compute its value
@@ -31,15 +86,34 @@ Which of the following edits are not observable compared to the original program
 	- → (solution help) ignore details like line-numbers for function values.
 	- #CPL/exam-info/important **train on these exercises + how to write it down to save time**
 
-![[3. Resources/MOCs/CPL/Notes/Exam info/image-2.png|smol example program]]
-
-![[3. Resources/MOCs/CPL/Notes/Exam info/image-3.png|I think this is the Stacker|342x185]]
-
+```plait
+(defvar x 1)
+(deffun (addx y)
+	(defvar x 2)
+	(+ x y))
+(+ (addx 0) x)
+```
 ---
 
 Given the configuration below. **Write a program** that results in this configuration.
 - (ignore values of randomly generated addresses)
 ![[3. Resources/MOCs/CPL/Notes/Exam info/image-4.png|example configuration that is provided|325x263]]
+
+Strategy: first write with *named functions*, then if need be replaced all named functions by lambdas.
+
+```plait
+(deffun (f x)
+	(deffun (g y) 
+		(+ ((lambda () 0)) y))
+	(+ (g 6) x))
+(f 3)
+```
+
+```
+((lambda (x)
+	(+ ((lambda (y)
+		(+ ((lambda () 0)) y)) 6) x)) 3)
+```
 
 ## Evaluation
  #CPL/exam-info/dont  **don’t need to memorize these type / grammar definitions** . Definitions will be given as part of exam question. #CPL/exam-info/unclear: what definitions exactly? Find this out properly.
