@@ -38,7 +38,7 @@
 - plai: large overlaps with Racket but has two extra features: allows pattern matching, allows the definition of unit tests
 - plait: typed version of plai
 
-# 
+# Chapter 2: SMoL & Q&A
 
 - (verify?)<mark style="background: #BBFABBA6;"> A is a **metalanguage** for B</mark>: language B is implemented in another language A
 - (verify?) language B is implemented in another another language A: there exists an interpreter written in language A for the language B
@@ -185,6 +185,8 @@ function was defined in
 **Closed expression**: expression with no unbound variables. 
 	- `(+ x 1)` where x is not bound → unclosed expression
 
+# Chapter 4: Syntactic Sugar
+
 **Syntactic sugar**: extra constructs that make your code easier to program and understand
 **Desugaring**: translating from a bigger surface language into a smaller core language
 
@@ -200,7 +202,11 @@ function was defined in
 
 **Hygiene**: property of keeping the variable bindings in the macro definition separate from the variable bindings at the point of macro expansion
 
-# Chapter 5
+In languages with eager evaluation, you cannot define new control structures as plain functions
+- Requirement: functions that operate on the syntax of their arguments
+- **Macro**: function that take syntax as input an transform it to produce new syntax
+Local binding (let): syntactic sugar for function application
+# Chapter 5: Objects
 
 We define objects as syntactic sugar
 
@@ -272,6 +278,45 @@ Two interesting questions about classes/objects:
 - Drawbacks: problems arise when the superclasses define members with the same name → which one to choose?
 
 ![[image-22.png|Mixin’s can be applied as needed. Flyable is not implemented in advance.]]
+
+# Chapter 6: Types
+
+The environment $\Gamma$ proves that the expression $e$ has type $T$
+![[image-34.png|430x119]]
+
+![[image-35.png|388x137]]
+
+**Axiom**: typing rule with no antedecents
+- Holds unconditionally
+![[image-36.png|414x113]]
+
+![[image-37.png|478x188]]
+
+Antedecent: the extended environment where $x$ is bound to type $T$ proves that $e$ is of type $U$
+Consequent: the environment proves that the lambda that takes an argument $x$ of type $T$ and has body $e$ is of type $T \to U$.
+- This is because in the body of the lambda, the environment $\Gamma$ is extended to $\Gamma[x \leftarrow T]$.
+![[image-38.png|245x53]]
+
+Type checking: start from the bottom!
+
+$\Gamma(x)$: type that is bound to $x$ in environment $\Gamma$
+$\Gamma$: Type environment. Binds variables to types (e.g. $\Gamma(x) = Num$)
+
+A type system is **sound** $\Leftrightarrow$ if $e:t$, and if $e \rightarrow v$ then $v:t$
+- Whatever type the type-checker predicts the program to have, is exactly the type of the value that the program computes
+- Even if the type-checker is sound: there may exist expressions for which the type-checker predicts a type $e:t$ but will never reduce to a value of that type because the program never terminates.
+
+Similarities and differences between interpretation and type-checking:
+- Similarities:
+	- Both use **environments**
+	- They are **both evaluators**: turn programs into answers
+		- Difference: 
+			- type-checkers produce true/false based on whether the types are consistent
+			- interpreters compute the result of evaluating the program
+
+Type-safety benefits:
+- **Savings in space** (more compact memory representations of values)
+- **Savings in time** (prevent run-time type checking)
 
 # Lecture 7: Continuations
 
@@ -352,6 +397,11 @@ CPS transformation is hard to understand due to inversion of control
 - JavaScript code is **embedded in a host environment**:
 	- If embedded **within browser host**: access to DOM and Local storage
 	- If embedded **within server host**: access to network and file IO
+
+- JS is a **scripting language**: embedded and used in a host environment
+	- Host environment: a bit more specific than “OS where the program runs” → designed to only exist inside some other program
+		- E.g. event loop is offered by nodeJS, not within the scripts themselves
+	- Compare with *Flash games*: support was dropped (no host environment) → game scripts could not run anymore.
 
 ![[image-27.png|535x249]]
 
@@ -437,10 +487,107 @@ Events in javascript make use of inversion of control
 		- If XHR was synchronous then the entire event loop would be **blocked** and the web page would be **unresponsive**
 
 ![[CPL Summary 2026-01-20 21.58.15.excalidraw|callback hell]]
-**Callback hell**: async IO leads to inversion of control
+**Callback hell**: deeply nested code that we obtain because we the rest of the work to be done in callback functions.
 
 Exceptions don’t work for asynchronous operations
 - Caller has already returned when the operation is executed
 - Common pattern: pass error object as argument to callback function
 	- If success: error is `undefined`
 	- If failed: error contains `Error` object with details
+
+The JS code **still runs on a single main thread**, only one task at a time!
+- Longer processing is delegated to OS or browser, callback is used to let JS handle the result again
+
+**Call stack:** live runtime structure of *active* function calls
+**Stack trace:** *snapshot* of a call stack at a particular moment (e.g. after error)
+
+Event loops and non-blocking IO:
+- Benefits
+	- **Run-to-completion:** functions are never pre-empted while running
+		- New events gets pushed onto the event queue and the event loop pops them one by one
+	- **Better resource utilisation**: event loop never blocks on external I/O → user application remains responsive to user events
+- Drawbacks
+	- **Inversion of control**: more difficult to understand the control flow.
+		- Rest of the computation provided as callback → callback hell
+	- **No call stack to unwind**:
+		- **Harder to debug**: stack traces in event handlers don’t reveal context
+			- Error happen at a different place than where the callback is fired 
+			- E.g. `fileIO` error “file not found” in OS, callback (event handler) has no knowledge of context for this error)
+		- No exception handling
+
+## Promises
+
+**Promise**: placeholder for a value that may only be available in the future
+- Most asynchronous APIs return a `Promise` instead of taking a `callback` function as extra argument
+
+![[CPL Summary 2026-01-21 10.14.38.excalidraw|promises vs callbacks]]
+
+Promise is an *object* that can be in one of three states:
+- Pending: initial state
+- Fulfilled (with a value)
+- Rejected (with an error)
+
+Once a promise is either fulfilled or rejected, it remains in that state
+### Promise chaining
+
+- A call to `then` returns a chained promise
+	- Success and failure callbacks passed to then may return a `value` or throw an `Exception`
+		- If returns a value: fulfill the chained promise
+		- If exception is thrown: reject the chained promise
+
+**Promise chaining solves the problem of callback hell**
+
+![[image-31.png|Promise chaining solves callback hell|452x127]]
+
+Resolving a promise `p1` with another promise `p2` causes `p1` to eventually become fulfilled/rejected with the same value/error as `p2`
+
+![[image-32.png|promise.then is another promise that gets resolved/rejected|384x173]]
+
+![[CPL Summary 2026-01-21 10.27.18.excalidraw]]
+
+`Promise.all`:
+- Fufills if: **all** of the promises fulfil
+- Rejects if: **any** of the promises reject
+- Fulfilled value: all of the fulfilled promises’ values (`.then(vals => ...)`)
+`Promise.any:
+- Fulfills if: **any** of the promises fulfill
+- Rejects if: **all** of the promises reject
+- Fulfilled value: value of the first promise to be fulfilled (`.then(val => ...)`)
+	- what if all promises reject?
+
+Concepts related to Promises exist in other languages as well: **futures**, **deferreds**, **tasks**
+- Many differences in terms of API
+	- **opaque vs transparent**: is `Promise<T>` a subtype of `T`?
+		- E.g. is `Promise<int>` a subtype of `int`? (Transparent?)
+	- **read-only vs read-write**: does having access to the promise object mean you can also set its value?
+		- E.g. change return value of promise from 3 → 5
+	- **blocking vs non-blocking**: does accessing the Promise’s value suspend the calling thread until the value is available?
+
+**Terminology** of Promises is *inconsistent* across languages
+- E.g. Promise in scala $\neq$ Promise in JavaScript
+
+Compared to callbacks, promises make **delayed computation explicit as data**
+- Promise = object = data
+- Benefits:
+	- Delayed computation can be **composed** through standard function composition (`.then().then()...`)
+	- **Automatic propagation of errors**: Promise objects distinguish success paths from failure paths
+		- If `p2` is chained on `p1`: if `p1` rejects, then `p2` also rejects if it does not handle the error
+- Drawbacks:
+	- Delayed computation **must still be wrapped in nested functions**
+		- `promise.then(() => ...)` → the callback `() => ...` still has to be provided as nested function
+	- We cannot use sequential control flow constructs: `while`, `return`, `try-catch`, …
+## Async functions
+[[Async await example]]
+
+- `Async`: a **modifier** that is used to mark a function as an async function
+	- Async function: function that always returns promises
+- `Await expr`: wraps **expression** into a promise where the continuation of `Await expr` is configured to be a delayed computation on `p`.
+	- The async function immediately returns p
+	- Can only be used inside an async function
+
+![[image-33.png|(Simplified) CPS transform from async/await to normal functions|595x124]]
+
+# Chapter 9: TypeScript
+
+
+
