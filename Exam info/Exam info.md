@@ -13,6 +13,9 @@
 #CPL/exam-info/tbc do the ungraded exercises but **be careful for time-sinks when implementing**. They might be helpful however
 #CPL/exam-info/todo identify what the ungraded assignments try to teach you and extract valuable knowledge from it (either by making exercise yourself, or just looking at model solution)
 
+[[Exam questions - 29 january 2025]]
+[[Exam questions - 24 january 2025]]
+
 ## SMoL: understanding scoping, aliasing and mutation
 
 What is the result of evaluating these programs?
@@ -99,7 +102,7 @@ Given the configuration below. **Write a program** that results in this configur
 - (ignore values of randomly generated addresses)
 ![[3. Resources/MOCs/CPL/Notes/Exam info/image-4.png|example configuration that is provided|325x263]]
 
-Strategy: first write with *named functions*, then if need be replaced all named functions by lambdas.
+Strategy: first write with *named functions*, then if need be, replace all named functions by lambdas → easier to understand what is happening!
 
 ```plait
 (deffun (f x)
@@ -133,12 +136,29 @@ Write a basic unit test to test your extension, using plait’s (`test <expr> <e
 
 ## Syntactic sugar
 
-![[3. Resources/MOCs/CPL/Notes/Exam info/image-6.png|Racket macro definition + example using it is provided|225x197]]
+What is the result of evaluation of the program below?
+Write down example program **after macro expansion**
+![[3. Resources/MOCs/CPL/Notes/Exam info/image-6.png|example macro usage: expand + evaluate|225x197]]
 
-- What is the result of evaluation with this program
-	- Remember: variable binding and hygiene #CPL/exam-info/unclear : what is hygiene?
+Macro expanded code:
+```plait
+(let ([v2 5])
+	(if (< 0 v2)
+		(let ([v2' (< v2 10)])
+			(if v2'
+				v2'
+				#false
+				))
+		#false)]))
+		)
+	))
+```
 
-- Write down example program **after macro expansion**
+The expression evaluates to `#true`. Because `0 < 5` and `v2 = (5 < 10) = #true`.
+Due to hygienic macro expansion: `v2` from the macro becomes `v2'`
+
+---
+
 - For each variable use, **draw an arrow to the location** where the variable is bound
 
 ![[3. Resources/MOCs/CPL/Notes/Exam info/image-7.png|arrows to bound-variable locations|225x154]]
@@ -147,8 +167,6 @@ Write a basic unit test to test your extension, using plait’s (`test <expr> <e
 
 ## Objects 
 - “Translate this example (e.g. Racket → Java,  Java → Racket)”
-
----
 
 What is the **value** of this program?
 
@@ -159,16 +177,90 @@ What is the **value** of this program?
 
 ![[3. Resources/MOCs/CPL/Notes/Exam info/image-8.png|253x165]]
 
+```
+(define a-parent
+	(lambda (m)
+		(case m
+			[(add1) (lambda (x) (+ x 1))]
+			[(sub1) (lambda (x) (- x 1))])))
+
+(define a-child
+	(lambda (m)
+		(case m
+			[(add2) (lambda (x) (+ x 2))]
+			[(sub2) (lambda (x) (- x 2))]
+			[else (a-parent m)])))
+
+# Overrides add2 and implements add2 in terms of add1
+(define a-grand-child
+	(lambda (m)
+		(case m
+			[(add2) (lambda (x) ((a-child 'add1 ((a-child 'add1) x)))]
+			[else (a-child m)])))
+
+```
+
+```javascript
+// TODO check correctness
+
+class Parent {
+
+function add1(x) { x + 1 };
+function sub1(x) { x - 1 };
+
+}
+
+class Child extends Parent {
+
+function add2(x) {x + 2};
+function sub2(x) {x - 2};
+
+}
+```
+
+Result of program: `6` because `add1` is in the parent and we apply lambda: `(+ x 1)`
+
+
 ---
 
 **Rewrite** this Java code example in Racket **using the class-pattern.** (Java → Racket)
 ![[3. Resources/MOCs/CPL/Notes/Exam info/image-9.png|279x183]]
 
+```plait
+(define (make-parent)
+	(lambda (m)
+		(case m
+			[(add1 (lambda (x) (+ x 1)))
+			 (sub1 (lambda (x) (- x 1)))
+			]
+		)
+	)
+)
+
+(define (make-child)
+	(let ([parent (make-parent)])
+		(lambda (m)
+			(case m
+				[
+				(add2 (lambda (x) (+ x 2)))
+				(sub2) (lambda (x) (- x 2))
+				(else parent m)
+				]
+			)
+		)
+	)
+)
+
+(let ([a-child (make-child)])
+	(a-child 'add1)
+)
+
+```
+
 ---
 ## Types
 
 Given **a typed miniPlait program**, be able to determine type-correctness  and/or **(manually) compute the type of a program**
-- #CPL/unclear what is type-correctness?
 
 **What is the type** of this program? If it does not have a type, indicate why.
 - Know the **conditions on when a type can be formed** and when not
@@ -180,6 +272,8 @@ Given **a typed miniPlait program**, be able to determine type-correctness  and/
 
 Example question about judgement trees
 ![[3. Resources/MOCs/CPL/Notes/Exam info/image-11.png|369x233]]
+
+![[image.png|judgement tree worked out example]]
 
 ---
 ## Javascript & Typescript

@@ -38,12 +38,16 @@
 - plai: large overlaps with Racket but has two extra features: allows pattern matching, allows the definition of unit tests
 - plait: typed version of plai
 
+- Difference between `let` and `define`
+	- `let ([]) (body)` → bindings only exist within the body
+	- `define (name) (expr)` → does not have to be evaluated within a body
+
 # Chapter 2: SMoL & Q&A
 
 - (verify?)<mark style="background: #BBFABBA6;"> A is a **metalanguage** for B</mark>: language B is implemented in another language A
 - (verify?) language B is implemented in another another language A: there exists an interpreter written in language A for the language B
 
-![[image.png|223x105]]
+![[image.png|319x146]]
 
 ## Modern programming languages core features
 
@@ -283,7 +287,10 @@ Two interesting questions about classes/objects:
 # Chapter 6: Types
 
 The environment $\Gamma$ proves that the expression $e$ has type $T$
-![[image-34.png|430x119]]
+![[image-34.png|251x69]]
+
+**Judgement**: tree that results from applying the typing rules until every part of the tree results in an **axiom**
+**Type-error**: failure to construct a judgement ($\Gamma \text{|-} \text{"hi"} : \text{Num}$ is an invalid statement → tree cannot be constructed)
 
 ![[image-35.png|388x137]]
 

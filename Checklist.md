@@ -1,0 +1,5 @@
+- [ ] How to ‘compute’ type for a given program?
+- [ ] Javascript/Java syntax
+- [ ] Learn judgement tree by heart
+- [ ] Check assignments (Rust, extending interpreter,…)
+- [ ] SMoL tutorial pdfs
