@@ -1,3 +1,25 @@
+```javascript
+function passwordCheckerb(email, password, cb) {
+	return new Promise((resolve, reject) => {
+		
+	})
+	const user = passwordChecker(email, password) :
+	if (user) {
+		cb (null, user);
+	
+	) else ‹
+	
+	setTineout (()
+	
+	cb 'User Not
+	
+	Found! ');
+	
+	}, 1006):
+	}
+}
+```
+
 ## POSSIBLE QUESTION TYPE 1: CONVERT BETWEEN CB AND PROMISES
 ### PROMISE TO CALLBACK
 ```Javascript
