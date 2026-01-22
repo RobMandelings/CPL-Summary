@@ -82,6 +82,14 @@
 
 ## Stacker: key concepts
 
+
+![[image-42.png|128x73]]
+Remember for environment: `@<env-name>`, `binds ... (what is bound)`, `extending <env>`
+
+
+
+---
+
 - **Stack**: list of function calls waiting for a value → most recent function call: at the bottom  
 - **Environment**: list/set of bindings: variable name → value  
 	- environments extend other environments: variable binding not found locally → search in extended environment  
@@ -225,7 +233,9 @@
 ![[CPL Summary 2026-01-19 18.17.07.excalidraw]]
 
 - **Macro systems**: systems in which a (slightly abstracted) program source is rewritten into program source before parsing takes place  
-	- ??? Macrossystem? `(+ 1 2)` → `(+ 2 1)`  
+	- ??? Macrossystem? `(+ 1 2)` → `(+ 2 1)`
+
+![[image-43.png|138x129]]
 
 - Few languages expose macros to the programmer  
 - Some do with varying degrees flexibility  
@@ -576,19 +586,20 @@ Events in javascript make use of inversion of control
 - **Call stack:** live runtime structure of *active* function calls  
 - **Stack trace:** *snapshot* of a call stack at a particular moment (e.g. after error)  
 
-- Event loops and non-blocking IO:
-	- Benefits  
-		- **Run-to-completion:** functions are never pre-empted while running  
-			- New events gets pushed onto the event queue and the event loop pops them one by one  
-		- **Better resource utilisation**: event loop never blocks on external I/O → user application remains responsive to user events  
-	- Drawbacks  
-		- **Inversion of control**: more difficult to understand the control flow.  
-			- Rest of the computation provided as callback → callback hell  
-		- **No call stack to unwind**:  
-			- **Harder to debug**: stack traces in event handlers don’t reveal context  
-				- Error happen at a different place than where the callback is fired   
-				- E.g. `fileIO` error “file not found” in OS, callback (event handler) has no knowledge of context for this error)  
-			- No exception handling  
+Event loops and non-blocking IO:
+
+- Benefits  
+	- **Run-to-completion:** functions are never pre-empted while running  
+		- New events gets pushed onto the event queue and the event loop pops them one by one  
+	- **Better resource utilisation**: event loop never blocks on external I/O → user application remains responsive to user events  
+- Drawbacks 
+	- **Inversion of control**: more difficult to understand the control flow.  
+		- Rest of the computation provided as callback → callback hell  
+	- **No call stack to unwind**:  
+		- **Harder to debug**: stack traces in event handlers don’t reveal context  
+			- Error happen at a different place than where the callback is fired   
+			- E.g. `fileIO` error “file not found” in OS, callback (event handler) has no knowledge of context for this error)  
+		- No exception handling  
 
 ## Promises
 

@@ -177,6 +177,9 @@ What is the **value** of this program?
 
 ![[3. Resources/MOCs/CPL/Notes/Exam info/image-8.png|253x165]]
 
+![[ObjectToJava]]
+
+
 ```
 (define a-parent
 	(lambda (m)
